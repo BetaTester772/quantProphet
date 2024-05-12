@@ -47,13 +47,14 @@ class StockTrader:
         self.data.drop_duplicates(subset='Date', keep='last', inplace=True)
         self.model = train_model(self.data)
 
-    def check_model(self):
+    def check_model(self, real_price):
         if len(self.test_data) >= 5:
             cos_sim = cosine_similarity([self.test_data], [self.data['Close'].values[-5:]])
             # print(self.test_data)
             # print(self.data['Close'].values[-5:])
             # print(cos_sim)
-            if cos_sim < 0.95:
+            if (cos_sim < 0.95 or cos_sim > 1.05) or (abs(real_price - self.test_data[-1]) > 5) or (
+                    ((self.test_data[-1] / real_price) - 1) * 100 < -5):
                 return "restart"
 
     def trade(self, current_date, real_price):
@@ -89,7 +90,7 @@ class StockTrader:
                         self.stocks_owned - desired_quantity) + real_price * desired_quantity) / self.stocks_owned) if self.stocks_owned else real_price
                 self.transactions.append((current_date, 'buy', desired_quantity, real_price))
                 self.stock_system.buy_stock(desired_quantity)
-                print(f"주식 구매 완료: {desired_quantity} 주")
+                print(f"주식 구매 완료: {desired_quantity} 주, 잔고: {self.capital}")
 
         # 주식 판매 결정 (목표 수익률 달성 시)
         if self.stocks_owned > 0 and real_price >= self.purchase_price * self.target_return:
@@ -97,16 +98,16 @@ class StockTrader:
             self.transactions.append((current_date, 'sell', self.stocks_owned, real_price))
             self.stock_system.sell_stock(self.stocks_owned)
             print(
-                    f"주식 판매 완료: 구매가 {self.purchase_price}, 판매가 {real_price}, 수힉 {(real_price - self.purchase_price) * self.stocks_owned} ,수익률 {((real_price / self.purchase_price) - 1) * 100:.2f}%")
+                    f"주식 판매 완료: 구매가 {self.purchase_price}, 판매가 {real_price}, 수힉 {(real_price - self.purchase_price) * self.stocks_owned} ,수익률 {((real_price / self.purchase_price) - 1) * 100:.2f}%, 잔고: {self.capital}")
             self.stocks_owned = 0
             self.purchase_price = 0
-        # 주식 판매 결정 (손실률 5% 이상)
-        if self.stocks_owned > 0 and real_price <= self.purchase_price * 0.95:
+        # 주식 판매 결정 (손실률 10% 이상)
+        if self.stocks_owned > 0 and real_price <= self.purchase_price * 0.9:
             self.capital += self.stocks_owned * real_price
             self.transactions.append((current_date, 'sell', self.stocks_owned, real_price))
             self.stock_system.sell_stock(self.stocks_owned)
             print(
-                    f"주식 판매 완료: 구매가 {self.purchase_price}, 판매가 {real_price}, 손실 {(real_price - self.purchase_price) * self.stocks_owned}, 손실률 {((real_price / self.purchase_price) - 1) * 100:.2f}%")
+                    f"주식 판매 완료: 구매가 {self.purchase_price}, 판매가 {real_price}, 손실 {(real_price - self.purchase_price) * self.stocks_owned}, 손실률 {((real_price / self.purchase_price) - 1) * 100:.2f}%, 잔고: {self.capital}")
             self.stocks_owned = 0
             self.purchase_price = 0
 

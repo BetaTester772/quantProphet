@@ -12,6 +12,9 @@ def init_stock_system() -> Stock:
     print("Init Complete")
     print(system.check_my_asset())
 
+    if system.check_my_asset().get('stock') > 0:
+        system.sell_stock(system.check_my_asset().get('stock'))
+
     return system
 
 
@@ -57,14 +60,30 @@ def main():
                     break
             current_history.loc[i_date] = current_price
             trader.trade(i_date, current_price)
-            res = trader.check_model()
+            res = trader.check_model(current_price)
             if res == "restart":
                 print("!!Alert: restarting model!!")
-                trader = get_initial_stock_trader(stock_system)
+                stock_system = init_stock_system()
+                trader = get_initial_stock_trader(stock_system, target_return=1.01, periods=5)
+
+                i_date = datetime.now().date()
+
+                current_history = pd.DataFrame(data={'Date': [], 'Close': []})
+                history_len = len(stock_system.get_price_history())
             trader.update_model(current_history)
             i_date += timedelta(days=1)
-        # except Exception as e:
-        #     stock_system.sell_stock(trader.stocks_owned)
+        except KeyboardInterrupt:
+            stock_system.sell_stock(trader.stocks_owned)
+            break
+        except Exception as e:
+            print(e)
+            stock_system = init_stock_system()
+            trader = get_initial_stock_trader(stock_system, target_return=1.01, periods=5)
+
+            i_date = datetime.now().date()
+
+            current_history = pd.DataFrame(data={'Date': [], 'Close': []})
+            history_len = len(stock_system.get_price_history())
         finally:
             pass
             # trader.summarize_trading(last_price=current_history.iloc[-1]['Close'])
