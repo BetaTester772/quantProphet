@@ -42,6 +42,9 @@ class StockTrader:
         future = self.model.make_future_dataframe(periods=self.periods)
         forecast = self.model.predict(future)
         predicted_price = forecast.iloc[-1]['yhat']  # 예측 일수 후의 예상 가격
+        # 예측 일수간 예상 가격
+        predicted_prices = forecast['yhat'].values[-self.periods:]
+
         # current_predicted_price = forecast[forecast['ds'] == current_date]['yhat'].values[0]
 
         # 예상 수익률 계산
@@ -50,15 +53,15 @@ class StockTrader:
         # 현재 가격, 구매 가격 및 수익률 출력
         current_return = (real_price / self.purchase_price - 1) * 100 if self.stocks_owned > 0 else 0
         print(
-                f"현재 날짜: {current_date.date()}, {self.periods}일 동안의 예상 가격: {predicted_price}, 예상 수익률: {future_return:.2f}%, 현재 실제 가격: {real_price}, 구매 가격: {self.purchase_price}, 현재 수익률: {current_return:.2f}%")
-
-        print("Capital:", self.capital)
+                f"현재 날짜: {current_date.date()}, {self.periods}일 동안의 예상 가격: {predicted_prices.tolist()}, 예상 수익률: {future_return:.2f}%, 현재 실제 가격: {real_price}, 구매 가격: {self.purchase_price}, 현재 수익률: {current_return:.2f}%")
 
         # 주식 추가 구매 결정: 목표 수익률 달성 가능성 판단
         if predicted_price > real_price * self.target_return:
-            max_affordable_quantity = int(self.capital / real_price)
-            desired_quantity = max_affordable_quantity  # TODO: Modify logic here for more complex strategies
-            if desired_quantity > 0:
+            desired_quantity = int(self.capital / real_price)
+
+            min_predicted_price = min(predicted_prices)
+
+            if desired_quantity > 0 and min_predicted_price >= real_price:
                 self.stocks_owned += desired_quantity
                 self.capital -= desired_quantity * real_price
                 self.purchase_price = ((self.purchase_price * (
