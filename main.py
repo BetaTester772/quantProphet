@@ -60,6 +60,7 @@ def main():
                     current_price = stock_system.get_current_price()
                     break
             current_history.loc[i_date] = current_price
+            trader.fetch()
             trader.trade(i_date, current_price)
             res = trader.check_model(current_price)
             if res == "restart":
