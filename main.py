@@ -10,10 +10,11 @@ def init_stock_system() -> Stock:
     system.login("id", "pw")
 
     print("Init Complete")
-    print(system.check_my_asset())
 
     if system.check_my_asset().get('stock') > 0:
         system.sell_stock(system.check_my_asset().get('stock'))
+
+    print(system.check_my_asset())
 
     return system
 
