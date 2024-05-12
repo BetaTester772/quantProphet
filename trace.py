@@ -1,4 +1,5 @@
 from sparklestock import Stock
+from time import sleep
 
 
 def init_stock_system() -> Stock:
@@ -18,3 +19,4 @@ if __name__ == '__main__':
         if stock_system.check_my_asset() != temp:
             temp = stock_system.check_my_asset()
             print(temp)
+        sleep(2)
