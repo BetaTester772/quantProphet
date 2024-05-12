@@ -77,16 +77,16 @@ def main():
         except KeyboardInterrupt:
             stock_system.sell_stock(trader.stocks_owned)
             break
-        # except Exception as e:
-        #     print(e)
-        #     purchase_price = trader.get_purchase_price()
-        #     trader = get_initial_stock_trader(stock_system, target_return=1.01, periods=5,
-        #                                       purchase_price=purchase_price)
-        #
-        #     i_date = datetime.now().date()
-        #
-        #     current_history = pd.DataFrame(data={'Date': [], 'Close': []})
-        #     history_len = len(stock_system.get_price_history())
+        except Exception as e:
+            print(e)
+            purchase_price = trader.get_purchase_price()
+            trader = get_initial_stock_trader(stock_system, target_return=1.01, periods=5,
+                                              purchase_price=purchase_price)
+
+            i_date = datetime.now().date()
+
+            current_history = pd.DataFrame(data={'Date': [], 'Close': []})
+            history_len = len(stock_system.get_price_history())
         finally:
             pass
             # trader.summarize_trading(last_price=current_history.iloc[-1]['Close'])
