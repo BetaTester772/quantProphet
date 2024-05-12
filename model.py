@@ -132,7 +132,8 @@ class StockTrader:
                 f"현재 날짜: {current_date.date()}, {self.periods}일 동안의 예상 가격: {predicted_prices.tolist()}, 예상 수익률: {future_return:.2f}%, 현재 실제 가격: {real_price}, 구매 가격: {self.purchase_price}, 현재 수익률: {current_return:.2f}%")
 
         # 주식 추가 구매 결정: 목표 수익률 달성 가능성 판단
-        if predicted_price > real_price * self.target_return:
+        # if predicted_price > real_price * self.target_return:
+        if predicted_price > real_price * 1.03:
             desired_quantity = int(self.capital / real_price)
 
             min_predicted_price = min(predicted_prices)
