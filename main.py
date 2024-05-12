@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 def init_stock_system() -> Stock:
     system = Stock("http://3.34.181.14")
-    system.login("betatester772", "thisismypassword")
+    system.login("id", "pw")
 
     print("Init Complete")
     print(system.check_my_asset())
