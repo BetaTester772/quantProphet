@@ -34,12 +34,12 @@ def get_formated_history(stock_system: Stock):
     return df
 
 
-def get_initial_stock_trader(stock_system: Stock, target_return=1.05, periods=5):
+def get_initial_stock_trader(stock_system: Stock, target_return=1.05, periods=5, purchase_price=0):
     df = get_formated_history(stock_system)
 
     trader = StockTrader(stock_system=stock_system, initial_data=df,
                          capital=stock_system.check_my_asset().get('money'),
-                         target_return=target_return, periods=periods)
+                         target_return=target_return, periods=periods, purchase_price=purchase_price)
 
     return trader
 
@@ -64,8 +64,9 @@ def main():
             res = trader.check_model(current_price)
             if res == "restart":
                 print("!!Alert: restarting model!!")
-                stock_system = init_stock_system()
-                trader = get_initial_stock_trader(stock_system, target_return=1.01, periods=5)
+                purchase_price = trader.get_purchase_price()
+                trader = get_initial_stock_trader(stock_system, target_return=1.01, periods=5,
+                                                  purchase_price=purchase_price)
 
                 i_date = datetime.now().date()
 
@@ -76,15 +77,16 @@ def main():
         except KeyboardInterrupt:
             stock_system.sell_stock(trader.stocks_owned)
             break
-        except Exception as e:
-            print(e)
-            stock_system = init_stock_system()
-            trader = get_initial_stock_trader(stock_system, target_return=1.01, periods=5)
-
-            i_date = datetime.now().date()
-
-            current_history = pd.DataFrame(data={'Date': [], 'Close': []})
-            history_len = len(stock_system.get_price_history())
+        # except Exception as e:
+        #     print(e)
+        #     purchase_price = trader.get_purchase_price()
+        #     trader = get_initial_stock_trader(stock_system, target_return=1.01, periods=5,
+        #                                       purchase_price=purchase_price)
+        #
+        #     i_date = datetime.now().date()
+        #
+        #     current_history = pd.DataFrame(data={'Date': [], 'Close': []})
+        #     history_len = len(stock_system.get_price_history())
         finally:
             pass
             # trader.summarize_trading(last_price=current_history.iloc[-1]['Close'])

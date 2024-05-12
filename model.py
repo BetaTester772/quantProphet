@@ -26,7 +26,7 @@ def train_model(data):
 
 # 주식을 사고 팔기 위한 클래스
 class StockTrader:
-    def __init__(self, initial_data, capital, target_return=1.05, periods=5, stock_system: Stock = None):
+    def __init__(self, initial_data, capital, target_return=1.05, periods=5, stock_system: Stock = None, purchase_price=0):
         self.stock_system: Stock = stock_system
         if stock_system is not None:
             self.capital = stock_system.check_my_asset().get('money')
@@ -36,11 +36,15 @@ class StockTrader:
             self.stocks_owned = 0
         self.data = initial_data.copy()
         self.model = train_model(self.data)
-        self.purchase_price = 0
+        self.purchase_price = purchase_price
         self.target_return = target_return
         self.periods = periods
         self.transactions = []  # 거래 내역 저장
         self.test_data = []
+
+    def get_purchase_price(self):
+        return self.purchase_price
+
 
     def update_model(self, new_data):
         self.data = pd.concat([self.data, new_data])

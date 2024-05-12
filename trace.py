@@ -14,9 +14,19 @@ def init_stock_system() -> Stock:
 
 if __name__ == '__main__':
     stock_system = init_stock_system()
+    temp = stock_system.check_my_asset()
+    last_money = temp['money']
     while True:
-        temp = stock_system.check_my_asset()
         if stock_system.check_my_asset() != temp:
             temp = stock_system.check_my_asset()
             print(temp)
-        sleep(2)
+            if temp['stock'] == 0:
+                if temp['money'] > last_money:
+                    print("You've earned money!", temp['money'] - last_money)
+                elif temp['money'] < last_money:
+                    print("You've lost money!", last_money - temp['money'])
+                last_money = temp['money']
+            elif temp['stock'] > 0:
+                print("You've bought stock!", temp['stock'])
+            print()
+        sleep(1)
