@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 def init_stock_system() -> Stock:
     system = Stock("http://3.34.181.14")
-    system.login("id", "pw")
+    system.login("betatester", "thisismypassword")
 
     print("Init Complete")
 
@@ -73,7 +73,7 @@ def main():
 
                 current_history = pd.DataFrame(data={'Date': [], 'Close': []})
                 history_len = len(stock_system.get_price_history())
-            trader.update_model(current_history)
+            trader.update_model(current_history)  # TODO: 시간 넘치면 빼기.
             i_date += timedelta(days=1)
         except KeyboardInterrupt:
             stock_system.sell_stock(trader.stocks_owned)

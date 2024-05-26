@@ -15,7 +15,7 @@ def train_model(data):
     model = Prophet(yearly_seasonality=False,
                     weekly_seasonality=False,
                     daily_seasonality=False,
-                    changepoint_prior_scale=0.75,
+                    changepoint_prior_scale=0.95,
                     interval_width=0.95,
                     changepoint_range=0.95)
     model.add_country_holidays(country_name='KOR')
